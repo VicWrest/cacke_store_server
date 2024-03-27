@@ -16,7 +16,6 @@ class Controller{
 
             if(img) {
                  const newProduct = await productService.downloadImg(product.dataValues.id, img);
-                 console.log(newProduct)
                  return res.json(newProduct);     
             }
             return res.json(product);
@@ -28,12 +27,53 @@ class Controller{
         
     }
     
-    async getAllOrders(req, res){
-        const {username}= req.params;
-        const orders = await Order.findAll({where: {username}})
-        res.status(200).json(orders);
+    async getAllProducts(req, res){
+        try{
+            const {typeId} = req.params;
+            let products;
+            if(typeId){
+                products = Product.findAll({where : {typeId}})
+            }
+            else{
+                products = Product.findAll({})
+            }
+            return res.json(products);         
+        }
+        catch(err){
+            next(ApiError.badRequest("Ошибка получения товара"));
+    };
+   };
+   
+   async getProductById(req, res){
+        try{
+            const {id} = req.params;
+           const product = Product.findOne({
+       where : {id},
+       include: [{model: ProductInfo, as: 'info'}]
+       })
+            return res.json(product);         
+        }
+        catch(err){
+            next(ApiError.badRequest("Ошибка создания товара"));
+    };
+   };
+   
+   async uploadImg(req, res, next){
+      try{
+         const {id} = req.id;
+         const img = req.files.img;
+         if(!img) {
+          next(ApiError.badRequest("Не удалось получить фото"))   
+        }
+        const product = await productService.downloadImg(product.dataValues.id, img);
+        return res.json(product);
+        }
+        catch(err){
+            console.log(err);
+            next(ApiError.badRequest("Ошибка создания товара"));
+        }
+        
     }
-
 };
 
 module.exports = new Controller();

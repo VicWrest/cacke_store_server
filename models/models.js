@@ -35,8 +35,10 @@ const Type = sequelize.define('type', {
 
 const Review = sequelize.define('review', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    authorName: {type: DataTypes.STRING, defaultValue: "Пользователь предпочел скрыть свое имя"}
+    rating: {type: DataTypes.INTEGER, allowNull: true},
     description: {type: DataTypes.STRING, allowNull: false},
-    img: {type: DataTypes.STRING, allowNull: false}
+    img: {type: DataTypes.STRING, allowNull: true}
 
 })
 
