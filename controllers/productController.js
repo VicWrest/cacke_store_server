@@ -1,5 +1,5 @@
 const ApiError = require("../error/ApiError");
-const { Order, Product } = require("../models/models");
+const { Order, Product, ProductInfo, Korzh } = require("../models/models");
 
 const productService = require("../service/productService");
 
@@ -10,15 +10,30 @@ class Controller{
 
     async createNewProduct(req, res, next){
         try{
-            const {name, price, type, korzh} = req.body;
-            const img = req.files.img;
-            const product = await Product.create({name, price, type, korzh});
-
-            if(img) {
-                 const newProduct = await productService.downloadImg(product.dataValues.id, img);
-                 return res.json(newProduct);     
-            }
-            return res.json(product);
+            const {name, price, typeId, info} = req.body;
+            const img = req.files?.img;
+            const korzh = await Korzh.findAll({raw:true}); //raw - чтобы в ответе исключить метаданные
+            //создаем в бд продукт с каждым типом кор 
+            const products = await Promise.all(korzh.map(async el => {
+                const product = await Product.create({name, price, typeId: 2, korzhId: el.id});
+                if(img) {
+                    const newProduct = await productService.downloadImg(product.dataValues.id, img);  
+                    return newProduct;
+                }
+                if (info) {
+                    info = JSON.parse(info)
+                    info.forEach(i =>
+                        ProductInfo.create({
+                            title: i.title,
+                            description: i.description,
+                            productId: product.id
+                        })
+                    )
+                }
+                return product;
+                })
+            )    
+            return res.json(products);
         }
         catch(err){
             console.log(err);
@@ -27,15 +42,15 @@ class Controller{
         
     }
     
-    async getAllProducts(req, res){
+    async getAllProducts(req, res, next){
         try{
             const {typeId} = req.params;
             let products;
             if(typeId){
-                products = Product.findAll({where : {typeId}})
+                products = await Product.findAll({where : {typeId}})
             }
             else{
-                products = Product.findAll({})
+                products = await Product.findAll({})
             }
             return res.json(products);         
         }
@@ -44,17 +59,18 @@ class Controller{
     };
    };
    
-   async getProductById(req, res){
+   async getProductById(req, res, next){
         try{
             const {id} = req.params;
-           const product = Product.findOne({
+           const product = await Product.findOne({
        where : {id},
        include: [{model: ProductInfo, as: 'info'}]
        })
             return res.json(product);         
         }
         catch(err){
-            next(ApiError.badRequest("Ошибка создания товара"));
+            console.log(err);
+            next(ApiError.badRequest("Ошибка получения товара"));
     };
    };
    
@@ -73,6 +89,9 @@ class Controller{
             next(ApiError.badRequest("Ошибка создания товара"));
         }
         
+    }
+    async deleteProduct(req, res, next){
+        //TO DO
     }
 };
 

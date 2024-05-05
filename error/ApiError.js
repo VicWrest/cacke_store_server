@@ -13,6 +13,10 @@ class ApiError extends Error {
     static forBidden(message) {
         return new ApiError(500, message)  
     }
+    static UnavtorizedError(message) {
+      return new ApiError(401, message)
+    }
+
     
     }
     

@@ -1,0 +1,31 @@
+const ApiError = require("../error/ApiError");
+const { Review } = require("../models/models");
+const { downloadImg } = require("../service/ReviewService");
+const userService = require("../service/userService");
+
+class UserController {
+    async registration(req, res, next){
+        try {
+			const addedUser = await userService.registration(req.body);
+			res.status(200).json(addedUser);
+		}
+        catch(err){
+            console.log(err);
+            return;
+        }
+        
+    }
+    async login(req, res, next){
+        try {
+			const addedUser = await userService.login(req.body);
+			res.status(200).json(addedUser);
+		}
+        catch(err){
+            console.log(err);
+            next(ApiError.badRequest("Ошибка создания товара"));
+        }
+        
+    }
+};
+
+module.exports = new UserController();

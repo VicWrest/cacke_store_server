@@ -1,3 +1,4 @@
+const { connectionManager } = require("../db/db");
 const ApiError = require("../error/ApiError");
 const { Type } = require("../models/models");
 
@@ -5,6 +6,7 @@ class Controller {
     async createNewType(req, res, next){
         try{
            const {name} = req.body;
+           console.log(name)
         const type = await Type.create({name});
         return res.json(type); 
         }

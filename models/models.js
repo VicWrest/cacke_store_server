@@ -8,17 +8,23 @@ const User = sequelize.define('user', {
 })
 
 const Order = sequelize.define('order', {
-    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true,},
-    username: {type: DataTypes.STRING}
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true}
 })
 
 const OrderProduct = sequelize.define('order_product', {
-    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true}
 })
 
+const Basket = sequelize.define('basket', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true,},
+    username: {type: DataTypes.STRING}
+})
+const BasketProduct = sequelize.define('basket_product', {
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+})
 const Product = sequelize.define('product', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    name: {type: DataTypes.STRING, unique: true, allowNull: false},
+    name: {type: DataTypes.STRING, allowNull: false},
     price: {type: DataTypes.INTEGER, allowNull: false},
     img: {type: DataTypes.STRING, allowNull: true}
 })
@@ -35,7 +41,7 @@ const Type = sequelize.define('type', {
 
 const Review = sequelize.define('review', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
-    authorName: {type: DataTypes.STRING, defaultValue: "Пользователь предпочел скрыть свое имя"}
+    authorName: {type: DataTypes.STRING, defaultValue: "Пользователь предпочел скрыть свое имя"},
     rating: {type: DataTypes.INTEGER, allowNull: true},
     description: {type: DataTypes.STRING, allowNull: false},
     img: {type: DataTypes.STRING, allowNull: true}
@@ -51,14 +57,20 @@ const ProductInfo = sequelize.define('product_info', {
 //расшифровка записи:
 //модель user имеет одну модель order,
 //модель order принадлежит модели user
-User.hasOne(Order)
+User.hasMany(Order)
 Order.belongsTo(User)
 
 User.hasMany(Review)
 Review.belongsTo(User)
 
-Order.hasMany(OrderProduct)
-OrderProduct.belongsTo(Order)
+Order.belongsToMany(Product, {through: OrderProduct});
+Product.belongsToMany(Order, {through: OrderProduct});
+
+// Order.hasMany(OrderProduct)
+// OrderProduct.belongsTo(Order)
+
+Basket.hasMany(BasketProduct)
+BasketProduct.belongsTo(Basket)
 
 Type.hasMany(Product)
 Product.belongsTo(Type)
@@ -66,8 +78,11 @@ Product.belongsTo(Type)
 Korzh.hasMany(Product)
 Product.belongsTo(Korzh)
 
-Product.hasMany(OrderProduct)
-OrderProduct.belongsTo(Product)
+// Product.hasMany(OrderProduct)
+// OrderProduct.belongsTo(Product)
+
+Product.hasMany(BasketProduct)
+BasketProduct.belongsTo(Product)
 
 Product.hasMany(ProductInfo, {as: 'info'});
 ProductInfo.belongsTo(Product)
@@ -80,5 +95,6 @@ module.exports = {
     Type,
     Korzh,
     Review,
-    ProductInfo
+    ProductInfo, 
+    Basket
 };
