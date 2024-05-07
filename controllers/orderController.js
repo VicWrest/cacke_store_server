@@ -21,7 +21,6 @@ class Controller {
         const user = await User.findOne({where: {name: username}});
         const orders = await user.getOrders({include: Product});
         res.status(200).json(orders);
-
     }
 };
 module.exports = new Controller();

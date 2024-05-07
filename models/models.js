@@ -16,8 +16,7 @@ const OrderProduct = sequelize.define('order_product', {
 })
 
 const Basket = sequelize.define('basket', {
-    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true,},
-    username: {type: DataTypes.STRING}
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true,}
 })
 const BasketProduct = sequelize.define('basket_product', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
@@ -66,23 +65,16 @@ Review.belongsTo(User)
 Order.belongsToMany(Product, {through: OrderProduct});
 Product.belongsToMany(Order, {through: OrderProduct});
 
-// Order.hasMany(OrderProduct)
-// OrderProduct.belongsTo(Order)
-
-Basket.hasMany(BasketProduct)
-BasketProduct.belongsTo(Basket)
+Basket.belongsToMany(Product, {
+    onDelete: "CASCADE",
+    through: BasketProduct});
+Product.belongsToMany(Basket, {through: BasketProduct});
 
 Type.hasMany(Product)
 Product.belongsTo(Type)
 
 Korzh.hasMany(Product)
 Product.belongsTo(Korzh)
-
-// Product.hasMany(OrderProduct)
-// OrderProduct.belongsTo(Product)
-
-Product.hasMany(BasketProduct)
-BasketProduct.belongsTo(Product)
 
 Product.hasMany(ProductInfo, {as: 'info'});
 ProductInfo.belongsTo(Product)
