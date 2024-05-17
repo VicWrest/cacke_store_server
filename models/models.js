@@ -12,14 +12,16 @@ const Order = sequelize.define('order', {
 })
 
 const OrderProduct = sequelize.define('order_product', {
-    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true}
-})
+    id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    date: {type: DataTypes.DATE, allowNull: false}
+});
 
 const Basket = sequelize.define('basket', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true,}
 })
 const BasketProduct = sequelize.define('basket_product', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
+    quantity: {type: DataTypes.INTEGER}
 })
 const Product = sequelize.define('product', {
     id: {type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true},
@@ -70,14 +72,21 @@ Basket.belongsToMany(Product, {
     through: BasketProduct});
 Product.belongsToMany(Basket, {through: BasketProduct});
 
+BasketProduct
+
 Type.hasMany(Product)
 Product.belongsTo(Type)
 
 Korzh.hasMany(Product)
 Product.belongsTo(Korzh)
 
+Korzh.hasMany(BasketProduct)
+BasketProduct.belongsTo(Korzh)
+
 Product.hasMany(ProductInfo, {as: 'info'});
 ProductInfo.belongsTo(Product)
+
+User.hasOne(Basket);
 
 module.exports = {
     User,
@@ -88,5 +97,6 @@ module.exports = {
     Korzh,
     Review,
     ProductInfo, 
-    Basket
+    Basket,
+    BasketProduct
 };
